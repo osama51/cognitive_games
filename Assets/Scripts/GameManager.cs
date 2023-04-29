@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         gameRunning = false;
-        particleSystem.Pause();
+        // particleSystem.Pause();
         sceneController.ShowStartPanel();
 
         // Stop the timer
@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour
                 sceneNum = 2;
             }
         }
-        particleSystem.Stop();
+        // particleSystem.Stop();
         EndRound();
     }
 

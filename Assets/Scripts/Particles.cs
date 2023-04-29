@@ -14,7 +14,7 @@ public class Particles : MonoBehaviour
         // GetComponent<ParticleSystemRenderer>().sortingLayerName = "UI";
 
         // stop the particle system from playing at the start
-        GetComponent<ParticleSystem>().Stop();
+        // GetComponent<ParticleSystem>().Stop();
     }
 
     // Update is called once per frame
