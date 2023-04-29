@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: e79f58e91a885354a96f4106b859988e
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - LMS Egyptian Bookends
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 27e1c0c6d7c9d2c4798b1aff90890dd7, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

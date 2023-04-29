@@ -16,18 +16,21 @@ public class GameManager : MonoBehaviour
     }
 
     public int maxRounds = 10;      // Maximum number of rounds
-    public int itemCount = 4;       // Number of items to display in each round
-    public float roundDuration = 12; // Duration of each round in seconds
+    public float roundDuration = 10; // Duration of each round in seconds
+
     public Text scoreText;          // UI Text element for displaying the score
     public Text roundText;          // UI Text element for displaying the round number
     public Text timerText;          // UI Text element for displaying the round timer
     public ItemGenerator itemGenerator;    // Reference to the ItemGenerator script
     public SceneController sceneController;  // Reference to the SceneController script
     public FuzzyScreen fuzzyScreen;          // Reference to the FuzzyScreen script
+    public DifficultyManager difficultyManager;  // Reference to the DifficultyManager script
+    public ParticleSystem particleSystem;  // Reference to the ParticleSystem
     public int sceneNum = 1;            // The current scene number
     public StartGameState startGameState = StartGameState.Start; // Current start game state
     public int score = 0;          // Current player score
     public GameObject statusBar;   // Reference to the status bar game object
+
 
     private int round = 0;          // Current round number
     private bool gameRunning = false;  // Flag to indicate if the game is currently running
@@ -81,14 +84,16 @@ public class GameManager : MonoBehaviour
                 break;
         }
         
+        // Call the difficulty manager
+        difficultyManager.ManageDifficulty(round);
         UpdateRoundUI();
+        particleSystem.Play();
 
         // Hide the start panel
         sceneController.HideStartPanel();
 
         // Start game from the SceneController
         sceneController.StartGame(round);
-
 
         // // Generate new set of items
         // itemGenerator.GenerateItems(itemCount);
@@ -105,6 +110,7 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         gameRunning = false;
+        particleSystem.Pause();
         sceneController.ShowStartPanel();
 
         // Stop the timer
@@ -121,18 +127,19 @@ public class GameManager : MonoBehaviour
             yield return null;
             remainingTime -= Time.deltaTime;
             UpdateTimerUI(remainingTime);
-            if(roundDuration-sceneController.itemDisplayTime+fuzzyScreen.duration<=remainingTime && sceneNum==1)
+            if(roundDuration-sceneController.itemDisplayTime-fuzzyScreen.duration<=remainingTime && sceneNum==1)
             {
                 sceneNum = 2;
             }
         }
+        particleSystem.Stop();
         EndRound();
     }
 
     // Update the timer UI element
     private void UpdateTimerUI(float remainingTime)
     {
-        timerText.text = "Time: " + remainingTime.ToString("F2");
+        timerText.text = "Time: " + remainingTime.ToString("F0");
     }
     
     // End the current round and transition to the next one

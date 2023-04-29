@@ -5,16 +5,19 @@ public class SceneController : MonoBehaviour
 {
     public Text roundText;              // Text object to display the current round number
     public Text feedbackText;           // Text object to display feedback to the player
+    public Text feedbackTextHiero;      // Text object to display feedback to the player in hieroglyphics
 
     public GameObject startButton;      // Start button to begin the game
     public Text startButtonText;        // Text object to display the start button text
+    public Text startButtonTextHiero;   // Text object to display the start button text in hieroglyphics
 
     public GameObject[] itemSlots;      // Array of item slots to display the items
-    public float itemDisplayTime;       // Time to display the items in seconds
+    public float itemDisplayTime = 5.0f;       // Time to display the items in seconds
     public GameObject startPanel;       // Panel to display the start button
     public GameObject feedBackPanel;    // Panel to display feedback to the player
     public GameManager gameManager;     // Reference to the GameManager script
     public ItemGenerator itemGenerator; // Reference to the ItemGenerator script
+    public DifficultyManager difficultyManager; // Reference to the DifficultyManager script
     public FuzzyScreen fuzzyScreen;     // Reference to the FuzzyScreen script
     public GameObject parentObject;     // Reference to the parent object of the items
     public GameObject panelToCoverListeners; // Panel to cover the listeners
@@ -31,7 +34,7 @@ public class SceneController : MonoBehaviour
     {
         roundText.text = "Round: " + roundNumber;
         feedbackText.text = "";
-        itemGenerator.GenerateItems(gameManager.itemCount);
+        itemGenerator.GenerateItems(difficultyManager.GetItemCount());
         items = itemGenerator.GetItems();
         addedItemIndex = itemGenerator.GetAddedItemIndex();
         DisplayItems();
@@ -198,17 +201,17 @@ public class SceneController : MonoBehaviour
         fuzzyScreen.Hide();
     }
 
-    // Begin the next round
-    public void NextRound()
-    {
-        roundNumber++;
-        roundText.text = "Round " + roundNumber;
-        feedbackText.text = "";
-        itemGenerator.GenerateItems(gameManager.itemCount);
-        items = itemGenerator.GetItems();
-        addedItemIndex = itemGenerator.GetAddedItemIndex();
-        DisplayItems();
-    }
+    // // Begin the next round
+    // public void NextRound()
+    // {
+    //     roundNumber++;
+    //     roundText.text = "Round " + roundNumber;
+    //     feedbackText.text = "";
+    //     itemGenerator.GenerateItems(gameManager.itemCount);
+    //     items = itemGenerator.GetItems();
+    //     addedItemIndex = itemGenerator.GetAddedItemIndex();
+    //     DisplayItems();
+    // }
 
     // Check if the player correctly identified the added item
     public void CheckAnswer(int selectedItemIndex)
@@ -227,8 +230,11 @@ public class SceneController : MonoBehaviour
             isCorrectItem = true;
             gameManager.IncrementScore();
             feedbackText.text = "Correct!";
+            feedbackTextHiero.text = feedbackText.text;
+
             // Enable the start button to begin the next round
             startButtonText.text = "Next Round";
+            startButtonTextHiero.text = startButtonText.text;
             startButton.SetActive(true);
         }
         else
@@ -236,8 +242,10 @@ public class SceneController : MonoBehaviour
             gameManager.startGameState = GameManager.StartGameState.Restart;
             isCorrectItem = false;
             feedbackText.text = "Incorrect. Try again.";
+            feedbackTextHiero.text = feedbackText.text;
             // Enable the start button to restart the round
             startButtonText.text = "Restart Round";
+            startButtonTextHiero.text = startButtonText.text ;
             startButton.SetActive(true);
         }
 
@@ -256,8 +264,10 @@ public class SceneController : MonoBehaviour
         HideStartButton();
 
         feedbackText.text = "Time's up. Try again.";
+        feedbackTextHiero.text = feedbackText.text;
         // Enable the start button to restart the round
         startButtonText.text = "Restart Round";
+        startButtonTextHiero.text = startButtonText.text ;
         startButton.SetActive(true);
     }
 
