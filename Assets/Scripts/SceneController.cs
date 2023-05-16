@@ -248,7 +248,7 @@ public class SceneController : MonoBehaviour
             startButtonTextHiero.text = startButtonText.text;
             startButton.SetActive(true);
 
-            if(gameManager.round == 2)
+            if(gameManager.round == 15)
             {
                 gameOverText.text = "Well Done! \nYou have completed the game!";
                 GameOver("Won");

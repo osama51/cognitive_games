@@ -58,8 +58,9 @@ public class DifficultyManager : MonoBehaviour
         // Clamp the item count to the maximum value
         currentItemCount = Mathf.Min(currentItemCount, maxItemCount);
 
+        float baseFuzzyScreenDuration = 1f;
         // Increase the fuzzy screen duration with a factor multiplied by 1.2 to the power of the current round number
-        fuzzyScreenDuration = fuzzyScreenDuration * Mathf.Pow(1.2f, (currenRound - 1));
+        fuzzyScreenDuration = baseFuzzyScreenDuration * Mathf.Pow(1.5f, (currenRound - 1));
 
         
         fuzzyScreenDuration = Mathf.Min(fuzzyScreenDuration, 6.0f);
