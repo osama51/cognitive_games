@@ -60,7 +60,13 @@ public class DifficultyManager : MonoBehaviour
 
         float baseFuzzyScreenDuration = 1f;
         // Increase the fuzzy screen duration with a factor multiplied by 1.2 to the power of the current round number
-        fuzzyScreenDuration = baseFuzzyScreenDuration * Mathf.Pow(1.5f, (currenRound - 1));
+        print("CURRENT ROUNDDD: " + currenRound);
+        if(currenRound == 1){
+            print("fuzzyScreenDuration: " + fuzzyScreenDuration);
+            fuzzyScreenDuration = baseFuzzyScreenDuration;
+            }
+        else
+        {fuzzyScreenDuration = baseFuzzyScreenDuration * Mathf.Pow(1.5f, (currenRound - 1));}
 
         
         fuzzyScreenDuration = Mathf.Min(fuzzyScreenDuration, 6.0f);

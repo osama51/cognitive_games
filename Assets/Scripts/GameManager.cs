@@ -148,7 +148,7 @@ public class GameManager : MonoBehaviour
             yield return null;
             remainingTime -= Time.deltaTime;
             
-            if(remainingTime < roundDuration - (roundDuration/2) + fuzzyScreen.duration)
+            if(remainingTime < roundDuration - ((roundDuration/2) + (fuzzyScreen.duration/2)))
             {
                 totalTime += Time.deltaTime;
             }
