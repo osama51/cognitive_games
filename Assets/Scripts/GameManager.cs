@@ -12,14 +12,19 @@ public class GameManager : MonoBehaviour
         Start,
         Restart,
         Next,
-        GameOver
+        GameOver,
+        GameFinished
     }
 
     public int maxRounds = 10;      // Maximum number of rounds
     public float roundDuration = 10; // Duration of each round in seconds
 
+    public GameObject backButton;      // Back button to return to the main menu       
     public Text scoreText;          // UI Text element for displaying the score
     public Text roundText;          // UI Text element for displaying the round number
+    public Text totalTimeText;
+    public float totalTime;
+    public float startTime;
     public Text timerText;          // UI Text element for displaying the round timer
     public ItemGenerator itemGenerator;    // Reference to the ItemGenerator script
     public SceneController sceneController;  // Reference to the SceneController script
@@ -32,12 +37,14 @@ public class GameManager : MonoBehaviour
     public GameObject statusBar;   // Reference to the status bar game object
 
 
-    private int round = 0;          // Current round number
+    public int round = 0;          // Current round number
     private bool gameRunning = false;  // Flag to indicate if the game is currently running
 
     // Start the game
     public void StartGame()
     {
+        // get the back button 
+        backButton.SetActive(true);
         statusBar.SetActive(true);
         gameRunning = true;
         UpdateScoreUI();
@@ -49,7 +56,9 @@ public class GameManager : MonoBehaviour
     public void EndGame()
     {
         gameRunning = false;
+        statusBar.SetActive(false);
 
+        
         // Disable the SceneController to prevent any more scenes from being loaded
         FindObjectOfType<SceneController>().enabled = false;
 
@@ -64,14 +73,14 @@ public class GameManager : MonoBehaviour
     }
 
 
-    // Start a new round
-    private void StartRound()
+    private void checkGameState()
     {
-
-        // Check start game state
         switch (startGameState)
         {
             case StartGameState.Start:
+            // take current time and equal it to totat time 
+                totalTime = 0f;
+                score = 0;
                 round = 1;
                 break;
             case StartGameState.Restart:
@@ -80,10 +89,17 @@ public class GameManager : MonoBehaviour
                 round++;
                 break;
             case StartGameState.GameOver:
-                EndGame();
+                // sceneController.GameOver();
                 break;
         }
-        
+    }
+    // Start a new round
+    private void StartRound()
+    {
+        checkGameState();
+        // Check start game state
+
+        if(startGameState != StartGameState.GameOver){
         // Call the difficulty manager
         difficultyManager.ManageDifficulty(round);
         UpdateRoundUI();
@@ -102,7 +118,7 @@ public class GameManager : MonoBehaviour
         // sceneController.DisplayItems();
 
         // Start timer for round duration
-        StartCoroutine(RoundTimer());
+        StartCoroutine(RoundTimer());}
         
     }
 
@@ -116,6 +132,11 @@ public class GameManager : MonoBehaviour
         // Stop the timer
         StopAllCoroutines();
 
+        if (sceneController.hideItemsCoroutine != null)
+        {
+            StopCoroutine(sceneController.hideItemsCoroutine); // Stop the coroutine
+            sceneController.hideItemsCoroutine = null;
+        }
     }
 
     private IEnumerator RoundTimer()
@@ -126,6 +147,12 @@ public class GameManager : MonoBehaviour
         {
             yield return null;
             remainingTime -= Time.deltaTime;
+            
+            if(remainingTime < roundDuration - (roundDuration/2) + fuzzyScreen.duration)
+            {
+                totalTime += Time.deltaTime;
+            }
+
             UpdateTimerUI(remainingTime);
             if(roundDuration-sceneController.itemDisplayTime-fuzzyScreen.duration<=remainingTime && sceneNum==1)
             {
@@ -152,11 +179,18 @@ public class GameManager : MonoBehaviour
         bool success = sceneController.GetIsCorrectItem();
 
         // If so, update score
-        if (success)
-        {
-            score++;
-            UpdateScoreUI();
-        }
+        // if (success)
+        // {
+        //     score++;
+        //     UpdateScoreUI();
+        // } 
+        // else {
+        //     if(score > 0)
+        //     {
+        //         score = score - 1;
+        //         UpdateScoreUI();
+        //     }
+        // }
 
         // Check if the maximum number of rounds has been reached
         if (round >= maxRounds)
@@ -187,7 +221,7 @@ public class GameManager : MonoBehaviour
         UpdateScoreUI();
     }
     // Update the score UI element
-    private void UpdateScoreUI()
+    public void UpdateScoreUI()
     {
         scoreText.text = "Score: " + score.ToString();
     }

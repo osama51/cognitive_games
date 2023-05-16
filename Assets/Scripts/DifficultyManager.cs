@@ -6,7 +6,7 @@ public class DifficultyManager : MonoBehaviour
     public int initialItemCount = 5;
 
     // The maximum number of items to display
-    public int maxItemCount = 15;
+    public int maxItemCount = 17;
 
     // The increment in the number of items to display each round
     public int itemIncrement = 1;
@@ -62,7 +62,7 @@ public class DifficultyManager : MonoBehaviour
         fuzzyScreenDuration = fuzzyScreenDuration * Mathf.Pow(1.2f, (currenRound - 1));
 
         
-        fuzzyScreenDuration = Mathf.Min(fuzzyScreenDuration, 5.0f);
+        fuzzyScreenDuration = Mathf.Min(fuzzyScreenDuration, 6.0f);
         GameObject.Find("FuzzyScreen").GetComponent<FuzzyScreen>().duration = fuzzyScreenDuration;
         print( "fuzzyScreenDuration: " + fuzzyScreenDuration);
         print("roundDuration Before: " + GameObject.Find("GameManager").GetComponent<GameManager>().roundDuration);

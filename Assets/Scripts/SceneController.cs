@@ -1,26 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SceneController : MonoBehaviour
 {
+    public Text gameOverText;           // Text object to display the game over message
     public Text roundText;              // Text object to display the current round number
     public Text feedbackText;           // Text object to display feedback to the player
     public Text feedbackTextHiero;      // Text object to display feedback to the player in hieroglyphics
 
+    public Text groupText;              // Text object to display our group name
     public GameObject startButton;      // Start button to begin the game
     public Text startButtonText;        // Text object to display the start button text
     public Text startButtonTextHiero;   // Text object to display the start button text in hieroglyphics
+
+    public GameObject backButton;      // Back button to return to the main menu       
 
     public GameObject[] itemSlots;      // Array of item slots to display the items
     public float itemDisplayTime = 5.0f;       // Time to display the items in seconds
     public GameObject startPanel;       // Panel to display the start button
     public GameObject feedBackPanel;    // Panel to display feedback to the player
+    public GameObject summaryPanel;     // Panel to display the summary of the game
+    public Text finalScoreText;         // Text object to display the final score
+    public Text finalRoundText;         // Text object to display the final round number
+    public Text finalTimeText;          // Text object to display the final time
+
+    public GameObject titlePanel;      // Panel to display the title of the game
+
     public GameManager gameManager;     // Reference to the GameManager script
     public ItemGenerator itemGenerator; // Reference to the ItemGenerator script
     public DifficultyManager difficultyManager; // Reference to the DifficultyManager script
     public FuzzyScreen fuzzyScreen;     // Reference to the FuzzyScreen script
     public GameObject parentObject;     // Reference to the parent object of the items
     public GameObject panelToCoverListeners; // Panel to cover the listeners
+    public Coroutine hideItemsCoroutine;      // Id of the invoke method to hide the items
 
     private int roundNumber;            // Current round number
     private GameObject[] items;         // Array of items generated for the current round
@@ -119,7 +134,8 @@ public class SceneController : MonoBehaviour
         }
 
         // Wait for the display time, then hide the items and display the second scene
-        Invoke("HideItems", itemDisplayTime);
+        // hideItemsInvokeId = Invoke("HideItems", itemDisplayTime);
+        hideItemsCoroutine = StartCoroutine(HideItemsCoroutine());
     }
 
     // Display the second scene
@@ -141,22 +157,14 @@ public class SceneController : MonoBehaviour
     }
 
     // Hide the items and display the second scene with the added item
-    private void HideItems()
+    // private void HideItems()
+    // {
+    private IEnumerator HideItemsCoroutine()
     {
+        yield return new WaitForSeconds(itemDisplayTime);
         // if game is running (not paused)
         if(gameManager.GetGameRunning())
         {
-            // Disable the item that was added in the first scene
-            // items[addedItemIndex].SetActive(false);
-
-            // // Display each item in a random slot
-            // for (int i = 0; i < items.Length; i++)
-            // {
-            //     // int randomSlot = Random.Range(0, itemSlots.Length);
-            //     // items[i].transform.position = itemSlots[randomSlot].transform.position;
-            //     items[i].SetActive(false);
-            // }
-
             // Display the fuzzy screen
             fuzzyScreen.Show();
         }
@@ -224,6 +232,9 @@ public class SceneController : MonoBehaviour
 
         gameManager.PauseGame();
         
+        // hide the groupText
+        groupText.text = "";
+        
         if (selectedItemIndex == addedItemIndex)
         {
             gameManager.startGameState = GameManager.StartGameState.Next;
@@ -236,17 +247,31 @@ public class SceneController : MonoBehaviour
             startButtonText.text = "Next Round";
             startButtonTextHiero.text = startButtonText.text;
             startButton.SetActive(true);
+
+            if(gameManager.round == 2)
+            {
+                gameOverText.text = "Well Done! \nYou have completed the game!";
+                GameOver("Won");
+            }
         }
         else
         {
-            gameManager.startGameState = GameManager.StartGameState.Restart;
-            isCorrectItem = false;
-            feedbackText.text = "Incorrect. Try again.";
-            feedbackTextHiero.text = feedbackText.text;
-            // Enable the start button to restart the round
-            startButtonText.text = "Restart Round";
-            startButtonTextHiero.text = startButtonText.text ;
-            startButton.SetActive(true);
+            if(gameManager.score > 0)
+            {
+                gameManager.score = gameManager.score - 1;
+                gameManager.UpdateScoreUI();
+            
+                gameManager.startGameState = GameManager.StartGameState.Restart;
+                isCorrectItem = false;
+                feedbackText.text = "Incorrect. Try again.";
+                feedbackTextHiero.text = feedbackText.text;
+                // Enable the start button to restart the round
+                startButtonText.text = "Restart Round";
+                startButtonTextHiero.text = startButtonText.text ;
+                startButton.SetActive(true);
+            } else {
+                GameOver("Lost");
+            }
         }
 
         // Clear the items from the previous round
@@ -256,20 +281,115 @@ public class SceneController : MonoBehaviour
     // time's up
     public void TimeUp()
     {
+
+        if(gameManager.score > 0)
+        {
+            gameManager.score = gameManager.score - 1;
+            gameManager.UpdateScoreUI();
+            gameManager.sceneNum=1;
+            gameManager.startGameState = GameManager.StartGameState.Restart;
+            // Pause and show the starting panel
+            gameManager.PauseGame();
+            // Hide the start button 
+            HideStartButton();
+            feedbackText.text = "Time's up. Try again.";
+            feedbackTextHiero.text = feedbackText.text;
+            // Enable the start button to restart the round
+            startButtonText.text = "Restart Round";
+            startButtonTextHiero.text = startButtonText.text ;
+            startButton.SetActive(true);
+        } else {
+            GameOver("Lost");
+        }
+    }
+
+    public void GameOver(string WonLost)
+    {
+        backButton.SetActive(false);
+
         gameManager.sceneNum=1;
-        gameManager.startGameState = GameManager.StartGameState.Restart;
+        gameManager.startGameState = GameManager.StartGameState.GameOver;
+        // Show the starting panel
+        ShowStartPanel();
+        // Hide the title panel
+        HideTitlePanel();
+        // Show the summary panel
+        ShowSummaryPanel();
+        
+        if(WonLost == "Won")
+        {
+            gameOverText.text = "Well Done! \nYou have completed the game";
+        } else {
+            gameOverText.text = "Game Over";
+        }
+
+        gameManager.statusBar.SetActive(false);
+        finalRoundText.text = "Round " + gameManager.round;
+        finalScoreText.text = "Highest Score: " + (gameManager.round - 1);
+        finalTimeText.text = "Time: " + gameManager.totalTime.ToString("F2") + "s";
+
         // Pause and show the starting panel
         gameManager.PauseGame();
-        // Hide the start button 
-        HideStartButton();
-
-        feedbackText.text = "Time's up. Try again.";
-        feedbackTextHiero.text = feedbackText.text;
         // Enable the start button to restart the round
-        startButtonText.text = "Restart Round";
+        startButtonText.text = "Main Menu";
         startButtonTextHiero.text = startButtonText.text ;
         startButton.SetActive(true);
     }
+
+    public void EndGame(){
+
+        backButton.SetActive(false);
+        gameManager.sceneNum=1;
+        gameManager.startGameState = GameManager.StartGameState.Start;
+        gameManager.score = 0;
+        difficultyManager.fuzzyScreenDuration = 1f;
+
+        gameManager.PauseGame();
+
+        ClearItems();
+        
+        gameManager.statusBar.SetActive(false);
+
+        // hide the groupText
+        groupText.text = "";
+
+        ShowStartPanel();
+        ShowTitlePanel();
+        HideSummaryPanel();
+
+
+        groupText.text = "SBME23 - GROUP 12";
+        feedbackText.text = "Find The Intrusive Scarab";
+        feedbackTextHiero.text = feedbackText.text;
+
+        startButtonText.text = "Start";
+        startButtonTextHiero.text = startButtonText.text ;
+
+        gameManager.startGameState = GameManager.StartGameState.Start;
+    }
+
+    private void HideTitlePanel()
+    {
+        titlePanel.SetActive(false);
+    }
+
+    private void ShowTitlePanel()
+    {
+        titlePanel.SetActive(true);
+    }
+
+    private void ShowSummaryPanel()
+    {
+        summaryPanel.SetActive(true);
+    }
+
+    private void HideSummaryPanel()
+    {
+        summaryPanel.SetActive(false);
+    }
+
+
+
 
     public bool GetIsCorrectItem()
     {

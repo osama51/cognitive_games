@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class StartButton : MonoBehaviour
 {
     public GameManager gameManager;
+    public SceneController sceneController;
 
     private void Start()
     {
@@ -13,8 +14,13 @@ public class StartButton : MonoBehaviour
 
     private void StartGame()
     {
-        gameManager.StartGame();
-        //  // Hide the button after pressing it
-        // btn.gameObject.SetActive(false);   
+        if(gameManager.startGameState != GameManager.StartGameState.GameOver){
+            gameManager.StartGame();
+            //  // Hide the button after pressing it
+            // btn.gameObject.SetActive(false);  
+        } else {
+            sceneController.EndGame();
+        }
+ 
     }
 }
