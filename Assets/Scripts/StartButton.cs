@@ -14,6 +14,7 @@ public class StartButton : MonoBehaviour
 
     private void StartGame()
     {
+        print("GAME STATE IS: " + gameManager.startGameState);
         if(gameManager.startGameState != GameManager.StartGameState.GameOver){
             gameManager.StartGame();
             //  // Hide the button after pressing it

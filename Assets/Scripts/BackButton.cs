@@ -18,7 +18,8 @@ public class BackButton : MonoBehaviour
 
     private void EndGame()
     {
-            sceneController.EndGame();
-            gameManager.startGameState = GameManager.StartGameState.Start; 
+            // sceneController.EndGame();
+            sceneController.GameOver("Lost");
+            // gameManager.startGameState = GameManager.StartGameState.Start; 
     }
 }

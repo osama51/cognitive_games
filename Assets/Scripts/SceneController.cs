@@ -250,7 +250,7 @@ public class SceneController : MonoBehaviour
 
             if(gameManager.round == 15)
             {
-                gameOverText.text = "Well Done! \nYou have completed the game!";
+                gameOverText.text = "Well Done!";
                 GameOver("Won");
             }
         }
@@ -305,10 +305,11 @@ public class SceneController : MonoBehaviour
 
     public void GameOver(string WonLost)
     {
+        ClearItems();
         backButton.SetActive(false);
-
         gameManager.sceneNum=1;
         gameManager.startGameState = GameManager.StartGameState.GameOver;
+        print("THE GAME IS OVER" + WonLost + " " + gameManager.startGameState);
         // Show the starting panel
         ShowStartPanel();
         // Hide the title panel
@@ -318,7 +319,7 @@ public class SceneController : MonoBehaviour
         
         if(WonLost == "Won")
         {
-            gameOverText.text = "Well Done! \nYou have completed the game";
+            gameOverText.text = "Well Done!";
         } else {
             gameOverText.text = "Game Over";
         }
@@ -338,9 +339,9 @@ public class SceneController : MonoBehaviour
 
     public void EndGame(){
 
+        print("END GAME IS  CALLED");
         backButton.SetActive(false);
         gameManager.sceneNum=1;
-        gameManager.startGameState = GameManager.StartGameState.Start;
         gameManager.score = 0;
         difficultyManager.fuzzyScreenDuration = 1f;
 
